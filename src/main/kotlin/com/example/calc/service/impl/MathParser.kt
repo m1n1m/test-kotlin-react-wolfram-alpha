@@ -59,7 +59,7 @@ class MathParser {
         while (true) {
             if (currentLexeme().type === LexemeType.POW) {
                 stepNextLexeme()
-                val rightValue = evalUnary()
+                val rightValue = evalPow()
                 value = value.pow(rightValue)
             }
             else {
