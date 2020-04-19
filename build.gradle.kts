@@ -35,6 +35,8 @@ dependencies {
     implementation( "com.squareup.retrofit2:retrofit:2.7.2")
     implementation( "com.squareup.retrofit2:converter-gson:2.7.2")
 
+    testImplementation( "junit:junit:4.13")
+
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(group = "org.junit.vintage", module = "junit-vintage-engine")
     }

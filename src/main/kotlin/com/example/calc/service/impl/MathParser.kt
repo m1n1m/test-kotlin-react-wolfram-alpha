@@ -8,7 +8,10 @@ class MathParser {
     private var pos = 0
 
     fun evaluate(exp: String): Double {
-        checkInputExpression(exp)
+        if (exp.isNullOrBlank()) {
+            throw RuntimeException("Empty Expression")
+        }
+
         pos = 0
         lexemes = analyzeLexemes(exp.replace("\\s+".toRegex(), ""))
         return evalPlusMinus()
@@ -89,8 +92,28 @@ class MathParser {
         return lexemes!![pos]
     }
 
-    private fun analyzeLexemes(exp: String): List<Lexeme> {
+    private fun analyzeLexemes(input: String): List<Lexeme> {
         val lexemes: MutableList<Lexeme> = LinkedList()
+
+        val parts = input.split(';')
+        var exp: String?
+        val vars: HashMap<Char, String> = HashMap()
+
+        if (parts.isNotEmpty()) {
+            exp = parts[parts.size-1]
+            val varsList = parts.subList(0, parts.size - 1)
+            for (vPart in varsList) {
+                val v = vPart.split('=')
+                if (v.size != 2) {
+                    throw RuntimeException("Syntax error in variables: $vPart")
+                }
+                vars[v[0].single()] = v[1]
+            }
+
+        } else {
+            exp = input;
+        }
+
         var pos = 0
         while (pos < exp.length) {
             var c = exp[pos]
@@ -120,6 +143,7 @@ class MathParser {
                     pos++
                 }
                 else -> if (c in '0'..'9') {
+
                     var dotsCount = 0
                     val sb = StringBuilder()
                     do {
@@ -134,8 +158,13 @@ class MathParser {
                         c = exp[pos]
                     } while (c in '0'..'9' || c == '.')
                     lexemes.add(Lexeme(LexemeType.NUMBER, sb.toString()))
+
                 } else {
-                    if (c != ' ') {
+                    if ("xyz".indexOf(c, 0, true) > -1) {
+                        val v = vars[c] ?: throw RuntimeException("Variable [$c] is not set")
+                        lexemes.add(Lexeme(LexemeType.NUMBER, v))
+                    }
+                    else if (c != ' ') {
                         throw RuntimeException("Unexpected character: $c")
                     }
                     pos++
@@ -144,11 +173,5 @@ class MathParser {
         }
         lexemes.add(Lexeme(LexemeType.EOF, ""))
         return lexemes
-    }
-
-    private fun checkInputExpression(exp: String?) {
-        if (exp.isNullOrBlank()) {
-            throw RuntimeException("Empty Expression")
-        }
     }
 }
