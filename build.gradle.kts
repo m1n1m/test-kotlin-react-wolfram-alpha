@@ -30,7 +30,6 @@ dependencies {
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core")
 
     implementation( "com.squareup.retrofit2:retrofit:2.7.2")
     implementation( "com.squareup.retrofit2:converter-gson:2.7.2")
@@ -59,7 +58,7 @@ task<com.moowork.gradle.node.yarn.YarnTask>("yarnInstallAll") {
 
 task<com.moowork.gradle.node.yarn.YarnTask>("buildFront") {
 
-    dependsOn("yarn_install", "yarnInstallAll")
+    dependsOn("yarnInstallAll")
 
     args = listOf("build")
 
