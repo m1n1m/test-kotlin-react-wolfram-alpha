@@ -54,13 +54,17 @@ tasks.withType<KotlinCompile> {
 
 task<com.moowork.gradle.node.yarn.YarnTask>("buildFront") {
 
-    dependsOn("yarn_install")
-    args = listOf("build")
+    args = listOf("install", "build")
+
+    val dest = "build/resources/main/static";
 
     doLast {
+        delete {
+            delete(fileTree(dest).include("**/*"))
+        }
         copy {
             from("webapp/build")
-            into("build/resources/main/static")
+            into(dest)
         }
     }
 }
