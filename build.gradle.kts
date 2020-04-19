@@ -54,7 +54,7 @@ tasks.withType<KotlinCompile> {
 
 task<com.moowork.gradle.node.yarn.YarnTask>("buildFront") {
 
-    args = listOf("install", "build")
+    args = listOf("add", "build")
 
     val dest = "build/resources/main/static";
 
