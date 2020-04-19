@@ -1,6 +1,7 @@
 package com.example.calc.service.impl
 
 import java.util.*
+import kotlin.math.pow
 
 class MathParser {
 
@@ -38,12 +39,12 @@ class MathParser {
     }
 
     private fun evalMultiplyDiv(): Double {
-        var value = evalUnary()
+        var value = evalPow()
         while (true) {
             val lexeme = stepNextLexeme()
             when (lexeme.type) {
-                LexemeType.OP_MUL -> value *= evalUnary()
-                LexemeType.OP_DIV -> value /= evalUnary()
+                LexemeType.OP_MUL -> value *= evalPow()
+                LexemeType.OP_DIV -> value /= evalPow()
                 LexemeType.EOF, LexemeType.RIGHT_BRACKET, LexemeType.OP_PLUS, LexemeType.OP_MINUS -> {
                     pos--
                     return value
@@ -53,10 +54,24 @@ class MathParser {
         }
     }
 
+    private fun evalPow(): Double {
+        var value = evalUnary()
+        while (true) {
+            if (currentLexeme().type === LexemeType.POW) {
+                stepNextLexeme()
+                val rightValue = evalUnary()
+                value = value.pow(rightValue)
+            }
+            else {
+                return value
+            }
+        }
+    }
+
     private fun evalUnary(): Double {
         val lexeme = currentLexeme()
         if (lexeme.type === LexemeType.OP_MINUS || lexeme.type === LexemeType.OP_PLUS) {
-            val nextLexeme = nextLexeme
+            val nextLexeme = getNextLexeme()
             if (nextLexeme.type === LexemeType.NUMBER || nextLexeme.type === LexemeType.LEFT_BRACKET) {
                 stepNextLexeme()
                 return if (lexeme.type === LexemeType.OP_MINUS) -factor() else factor()
@@ -85,8 +100,9 @@ class MathParser {
         return lexemes!![pos++]
     }
 
-    private val nextLexeme: Lexeme
-        private get() = lexemes!![pos + 1]
+    private fun getNextLexeme(): Lexeme {
+        return lexemes!![pos + 1]
+    }
 
     private fun currentLexeme(): Lexeme {
         return lexemes!![pos]
@@ -111,7 +127,7 @@ class MathParser {
             }
 
         } else {
-            exp = input;
+            exp = input
         }
 
         var pos = 0
@@ -140,6 +156,10 @@ class MathParser {
                 }
                 '/' -> {
                     lexemes.add(Lexeme(LexemeType.OP_DIV, c))
+                    pos++
+                }
+                '^' -> {
+                    lexemes.add(Lexeme(LexemeType.POW, c))
                     pos++
                 }
                 else -> if (c in '0'..'9') {

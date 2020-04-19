@@ -49,4 +49,12 @@ class CalcApplicationTests {
             parser.evaluate(exp)
         }
     }
+
+    @Test
+    fun testMathParserPow() {
+        val exp = "135-556 * 7 / 2  ^ 2 ^ 2 - (12*4.333)"
+        val parser = MathParser()
+        val result = parser.evaluate(exp)
+        Assert.assertEquals(result, -160.246, 0.0)
+    }
 }
