@@ -12,7 +12,6 @@ node {
     download = false
     version = "10.9.0"
     npmVersion = "6.9.0"
-    yarnVersion = "0.16.1"
     nodeModulesDir = file("${project.projectDir}/webapp")
 }
 
@@ -52,9 +51,15 @@ tasks.withType<KotlinCompile> {
     }
 }
 
+task<com.moowork.gradle.node.yarn.YarnTask>("yarnInstallAll") {
+    args = listOf("install")
+}
+
 task<com.moowork.gradle.node.yarn.YarnTask>("buildFront") {
 
-    args = listOf("add", "build")
+    dependsOn("yarn_install", "yarnInstallAll")
+
+    args = listOf("build")
 
     val dest = "build/resources/main/static";
 
