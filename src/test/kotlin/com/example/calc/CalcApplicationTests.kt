@@ -19,7 +19,7 @@ class CalcApplicationTests {
 
     @Test
     fun testMathParserWithoutVar() {
-        val exp = "2 * 3 - 12 * (99-2.332)"// "x = 3; 2 * x - 12"
+        val exp = "2 * 3 - 12 * (99-2.332)"
         val parser = MathParser()
         val result = parser.evaluate(exp)
         Assert.assertEquals(result, -1154.016, 0.0)
