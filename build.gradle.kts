@@ -69,14 +69,14 @@ task<com.moowork.gradle.node.yarn.YarnTask>("buildFront") {
 
     args = listOf("build")
 
-    val dest = "./build/resources/main/static";
+    val dest = "build/resources/main/static";
 
     doLast {
         delete {
             delete(fileTree(dest).include("**/*"))
         }
         copy {
-            from("./webapp/build")
+            from("webapp/build")
             into(dest)
         }
     }

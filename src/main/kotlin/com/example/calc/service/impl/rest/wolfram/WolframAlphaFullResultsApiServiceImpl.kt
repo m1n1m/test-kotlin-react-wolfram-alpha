@@ -5,32 +5,21 @@ import com.example.calc.service.rest.wolfram.WolframAlphaFullResultsApiService
 import com.wolfram.alpha.WAEngine
 import com.wolfram.alpha.WAException
 import com.wolfram.alpha.WAImage
-import okhttp3.OkHttpClient
 import org.springframework.stereotype.Service
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 
 
 @Service
 class WolframAlphaFullResultsApiServiceImpl : WolframAlphaFullResultsApiService {
 
     private val appID = "AW278K-K77H68RKL6"
-    private val restApi: WolframAlphaFullResultsApi
+    val engine: WAEngine = WAEngine()
 
     init {
-        val builder = OkHttpClient.Builder()
-        val retrofit: Retrofit = Retrofit.Builder()
-                .baseUrl(WolframAlphaFullResultsApi.BASE_URL)
-                .client(builder.build())
-                .addConverterFactory(GsonConverterFactory.create())
-                .build()
-        restApi = retrofit.create(WolframAlphaFullResultsApi::class.java)
+        engine.appID = appID
     }
 
     override fun query(input: String): CallWolframAlphaPlotImageResultDto {
 
-        val engine = WAEngine()
-        engine.appID = appID
         engine.addFormat("image")
         val query = engine.createQuery()
         query.input = input

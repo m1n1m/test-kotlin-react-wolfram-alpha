@@ -166,7 +166,7 @@ export default class CalculatorComponent extends React.Component<CalculatorCompo
                                 <Typography noWrap>
                                     Wolfram result
                                 </Typography>
-                                <img src={this.wolframResult.plotImageUrl} width={this.plotWidth} />
+                                <img alt="Wolfram plot" src={this.wolframResult.plotImageUrl} width={this.plotWidth} />
                             </React.Fragment>
                             }
                         </Grid>

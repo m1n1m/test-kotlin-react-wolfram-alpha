@@ -1,4 +1,3 @@
-import CalculationResultDto from "./CalculationResultDto";
 import {RestService} from "../../services";
 import CallWolframAlphaPlotImageResultDto from "./CallWolframAlphaPlotImageResultDto";
 
