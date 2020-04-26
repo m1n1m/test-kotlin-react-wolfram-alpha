@@ -1,16 +1,21 @@
 package com.example.calc.service.impl.rest.wolfram
 
+import com.example.calc.service.dto.CallWolframAlphaPlotImageResultDto
 import com.example.calc.service.rest.wolfram.WolframAlphaFullResultsApiService
+import com.wolfram.alpha.WAEngine
+import com.wolfram.alpha.WAException
+import com.wolfram.alpha.WAImage
 import okhttp3.OkHttpClient
 import org.springframework.stereotype.Service
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
-@Service
-class WolframAlphaFullResultsApiServiceImpl() : WolframAlphaFullResultsApiService {
 
-    private val appId = "AW278K-K77H68RKL6"
-    private lateinit var restApi: WolframAlphaFullResultsApi
+@Service
+class WolframAlphaFullResultsApiServiceImpl : WolframAlphaFullResultsApiService {
+
+    private val appID = "AW278K-K77H68RKL6"
+    private val restApi: WolframAlphaFullResultsApi
 
     init {
         val builder = OkHttpClient.Builder()
@@ -22,14 +27,31 @@ class WolframAlphaFullResultsApiServiceImpl() : WolframAlphaFullResultsApiServic
         restApi = retrofit.create(WolframAlphaFullResultsApi::class.java)
     }
 
-    override fun query(input: String): String {
-        val response = restApi.query("plaintext", "JSON", appId, input).execute()
-        val queryResult = response.body()?.asJsonObject?.get("queryresult")?.asJsonObject
-        if (queryResult?.get("success")?.asBoolean == false) {
-            return ""
+    override fun query(input: String): CallWolframAlphaPlotImageResultDto {
+
+        val engine = WAEngine()
+        engine.appID = appID
+        engine.addFormat("image")
+        val query = engine.createQuery()
+        query.input = input
+
+        val resultDto = CallWolframAlphaPlotImageResultDto()
+
+        try {
+            val queryResult = engine.performQuery(query)
+            resultDto.success = !queryResult.isError && queryResult.isSuccess
+            if (resultDto.success!!) {
+                for (pod in queryResult.pods) {
+                    if (pod.id == "Plot" && !pod.isError) {
+                        val image = pod.subpods[0].contents[0] as WAImage
+                        resultDto.plotImageUrl = image.url
+                    }
+                }
+            }
+        } catch (e: WAException) {
+            e.printStackTrace()
         }
-        val pods = queryResult?.get("pods")?.asJsonArray
-        val sub = pods?.find { el -> el.asJsonObject.get("id").asString == "Result" }
-        return sub?.asJsonObject?.get("subpods")?.asJsonArray?.get(0)?.asJsonObject?.get("plaintext")?.asString ?: ""
+
+        return resultDto
     }
 }

@@ -5,6 +5,7 @@ enum class LexemeType {
     OP_PLUS, OP_MINUS,
     OP_MUL, OP_DIV,
     NUMBER,
+    VAR,
     POW,
     EOF
 }

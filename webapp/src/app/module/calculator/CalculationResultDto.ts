@@ -1,5 +1,5 @@
 
 export default class CalculationResultDto {
-    value?: Number | null;
+    result?: number[][] | null;
     error?: string | null;
 }

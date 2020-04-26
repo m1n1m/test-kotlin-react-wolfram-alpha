@@ -7,11 +7,17 @@ export default class CalculationRestService implements RestService {
 
     }
 
-    public calculateExpression(exp: string) : Promise<CalculationResultDto>  {
+    public calculateExpression(exp: string, min: number, max: number, points: number) : Promise<CalculationResultDto>  {
         if (!exp) {
             return new Promise<CalculationResultDto>(resolve => {});
         }
-        let params = [['ex', exp.replace(' ', '')]];
+
+        let params = [
+            ['ex', exp.replace(' ', '')],
+            ['min', min.toString()],
+            ['max', max.toString()],
+            ['points', points.toString()]];
+
         const urlParams = new URLSearchParams(params).toString();
         const url = `${this.baseUrl}math-calculation/calculate?${urlParams}`;
         const requestOptions = {

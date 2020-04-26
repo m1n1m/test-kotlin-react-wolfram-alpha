@@ -1,5 +1,6 @@
 import CalculationResultDto from "./CalculationResultDto";
 import {RestService} from "../../services";
+import CallWolframAlphaPlotImageResultDto from "./CallWolframAlphaPlotImageResultDto";
 
 export default class WolframProxyRestService implements RestService {
 
@@ -7,9 +8,9 @@ export default class WolframProxyRestService implements RestService {
 
     }
 
-    public calculateExpression(exp: string) : Promise<CalculationResultDto>  {
+    public calculateExpression(exp: string) : Promise<CallWolframAlphaPlotImageResultDto>  {
         if (!exp) {
-            return new Promise<CalculationResultDto>(resolve => {});
+            return new Promise<CallWolframAlphaPlotImageResultDto>(resolve => {});
         }
         let params = [['ex', exp.replace(' ', '')]];
         const urlParams = new URLSearchParams(params).toString();

@@ -7,14 +7,31 @@ class MathParser {
 
     private var lexemes: List<Lexeme>? = null
     private var pos = 0
+    private var x: Double? = null
+    private var exp: String? = null
 
-    fun evaluate(exp: String): Double {
+    constructor()
+
+    constructor(exp: String) {
+        this.exp = exp
+    }
+
+    fun parseExpression(exp: String) {
         if (exp.isNullOrBlank()) {
             throw RuntimeException("Empty Expression")
         }
-
-        pos = 0
         lexemes = analyzeLexemes(exp.replace("\\s+".toRegex(), ""))
+    }
+
+    fun evaluate(): Double {
+        pos = 0
+        this.x = null
+        return evalPlusMinus()
+    }
+
+    fun evaluate(x: Double): Double {
+        pos = 0
+        this.x = x
         return evalPlusMinus()
     }
 
@@ -84,6 +101,13 @@ class MathParser {
         var lexeme = stepNextLexeme()
         return when (lexeme.type) {
             LexemeType.NUMBER -> lexeme.value.toDouble()
+            LexemeType.VAR -> {
+                if (lexeme.value == "x" && x != null) {
+                    x!!
+                } else {
+                    throw RuntimeException("Variable [${lexeme.value}] is not set")
+                }
+            }
             LexemeType.LEFT_BRACKET -> {
                 val value = evalPlusMinus()
                 lexeme = stepNextLexeme()
@@ -108,66 +132,27 @@ class MathParser {
         return lexemes!![pos]
     }
 
-    private fun analyzeLexemes(input: String): List<Lexeme> {
+    private fun analyzeLexemes(exp: String): List<Lexeme> {
+
         val lexemes: MutableList<Lexeme> = LinkedList()
-
-        val parts = input.split(';')
-        var exp: String?
-        val vars: HashMap<Char, String> = HashMap()
-
-        if (parts.isNotEmpty()) {
-            exp = parts[parts.size-1]
-            val varsList = parts.subList(0, parts.size - 1)
-            for (vPart in varsList) {
-                val v = vPart.split('=')
-                if (v.size != 2) {
-                    throw RuntimeException("Syntax error in variables: $vPart")
-                }
-                vars[v[0].single()] = v[1]
-            }
-
-        } else {
-            exp = input
-        }
-
         var pos = 0
+
         while (pos < exp.length) {
             var c = exp[pos]
             when (c) {
-                '(' -> {
-                    lexemes.add(Lexeme(LexemeType.LEFT_BRACKET, c))
-                    pos++
-                }
-                ')' -> {
-                    lexemes.add(Lexeme(LexemeType.RIGHT_BRACKET, c))
-                    pos++
-                }
-                '+' -> {
-                    lexemes.add(Lexeme(LexemeType.OP_PLUS, c))
-                    pos++
-                }
-                '-' -> {
-                    lexemes.add(Lexeme(LexemeType.OP_MINUS, c))
-                    pos++
-                }
-                '*' -> {
-                    lexemes.add(Lexeme(LexemeType.OP_MUL, c))
-                    pos++
-                }
-                '/' -> {
-                    lexemes.add(Lexeme(LexemeType.OP_DIV, c))
-                    pos++
-                }
-                '^' -> {
-                    lexemes.add(Lexeme(LexemeType.POW, c))
-                    pos++
-                }
+                '(' -> { lexemes.add(Lexeme(LexemeType.LEFT_BRACKET, c)); pos++ }
+                ')' -> { lexemes.add(Lexeme(LexemeType.RIGHT_BRACKET, c)); pos++ }
+                '+' -> { lexemes.add(Lexeme(LexemeType.OP_PLUS, c)); pos++ }
+                '-' -> { lexemes.add(Lexeme(LexemeType.OP_MINUS, c)); pos++ }
+                '*' -> { lexemes.add(Lexeme(LexemeType.OP_MUL, c)); pos++ }
+                '/' -> { lexemes.add(Lexeme(LexemeType.OP_DIV, c)); pos++ }
+                '^' -> { lexemes.add(Lexeme(LexemeType.POW, c)); pos++ }
+                'x', 'X' -> { lexemes.add(Lexeme(LexemeType.VAR, c.toString().toLowerCase())); pos++ }
                 else -> if (c in '0'..'9') {
-
-                    var dotsCount = 0
+                    var dots = 0
                     val sb = StringBuilder()
                     do {
-                        if (c == '.' && ++dotsCount > 1) {
+                        if (c == '.' && ++dots > 1) {
                             throw RuntimeException("Unexpected character: $c")
                         }
                         sb.append(c)
@@ -180,11 +165,7 @@ class MathParser {
                     lexemes.add(Lexeme(LexemeType.NUMBER, sb.toString()))
 
                 } else {
-                    if ("xyz".indexOf(c, 0, true) > -1) {
-                        val v = vars[c] ?: throw RuntimeException("Variable [$c] is not set")
-                        lexemes.add(Lexeme(LexemeType.NUMBER, v))
-                    }
-                    else if (c != ' ') {
+                    if (c != ' ') {
                         throw RuntimeException("Unexpected character: $c")
                     }
                     pos++

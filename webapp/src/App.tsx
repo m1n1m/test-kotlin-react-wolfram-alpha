@@ -17,8 +17,8 @@ export const makeAppStyles = makeStyles((theme) => ({
         width: 'auto',
         marginLeft: theme.spacing(2),
         marginRight: theme.spacing(2),
-        [theme.breakpoints.up(600 + theme.spacing(2) * 2)]: {
-            width: 600,
+        [theme.breakpoints.up(1200 + theme.spacing(2) * 2)]: {
+            width: 1200,
             marginLeft: 'auto',
             marginRight: 'auto',
         },

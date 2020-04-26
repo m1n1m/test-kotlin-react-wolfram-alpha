@@ -1,7 +1,7 @@
 package com.example.calc.service
 
-import com.example.calc.service.dto.CalculationResultDto
+import com.example.calc.service.dto.CallWolframAlphaPlotImageResultDto
 
 interface WolframAlphaService {
-    fun calculate(expression: String): CalculationResultDto
+    fun calculate(expression: String): CallWolframAlphaPlotImageResultDto
 }

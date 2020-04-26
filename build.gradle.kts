@@ -34,6 +34,13 @@ dependencies {
     implementation( "com.squareup.retrofit2:retrofit:2.7.2")
     implementation( "com.squareup.retrofit2:converter-gson:2.7.2")
 
+    implementation( "commons-codec:commons-codec:1.1")
+    implementation( "org.apache.httpcomponents:httpclient:4.5.12")
+    implementation( "org.apache.httpcomponents:httpcore:4.4.13")
+    implementation( "commons-logging:commons-logging:1.2")
+
+    implementation( fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))) )
+
     testImplementation( "junit:junit:4.13")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
@@ -52,24 +59,24 @@ tasks.withType<KotlinCompile> {
     }
 }
 
-task<com.moowork.gradle.node.yarn.YarnTask>("yarnInstallAll") {
+task<com.moowork.gradle.node.yarn.YarnTask>("yarnInstall") {
     args = listOf("install")
 }
 
 task<com.moowork.gradle.node.yarn.YarnTask>("buildFront") {
 
-    dependsOn("yarnInstallAll")
+    dependsOn("yarnInstall")
 
     args = listOf("build")
 
-    val dest = "build/resources/main/static";
+    val dest = "./build/resources/main/static";
 
     doLast {
         delete {
             delete(fileTree(dest).include("**/*"))
         }
         copy {
-            from("webapp/build")
+            from("./webapp/build")
             into(dest)
         }
     }
